@@ -29,22 +29,22 @@ The following packages are not yet officially released, they need to be installe
 
 django CMS 4.0
 ```
-pip install http://github.com/divio/django-cms/tarball/release/4.0.x#egg=django-cms
+pip install http://github.com/django-cms/django-cms/tarball/release/4.0.x#egg=django-cms
 ```
 
 djangocms-text-ckeditor
 ```
-pip install https://github.com/divio/djangocms-text-ckeditor/tarball/support/4.0.x#egg=djangocms-text-ckeditor
+pip install https://github.com/django-cms/djangocms-text-ckeditor/tarball/support/4.0.x#egg=djangocms-text-ckeditor
 ```
 
 djangocms-versioning
 ```
-pip install https://github.com/divio/djangocms-versioning/tarball/master#egg=djangocms-versioning
+pip install https://github.com/django-cms/djangocms-versioning/tarball/master#egg=djangocms-versioning
 ```
 
 djangocms-alias
 ```
-pip install https://github.com/divio/djangocms-alias/tarball/master#egg=djangocms-alias
+pip install https://github.com/django-cms/djangocms-alias/tarball/master#egg=djangocms-alias
 ```
 
 ## Installation
@@ -54,6 +54,9 @@ First install this package in your project
 ```
 pip install djangocms-4-migration
 ```
+
+In your `settings.py` add `djangocms_4_migration` to the list of `INSTALLED_APPS`.
+
 
 ## Running
 Simply run the following command to run the data migration. 
