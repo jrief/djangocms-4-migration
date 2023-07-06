@@ -1,4 +1,5 @@
 import logging
+import sys
 
 from django.core.management.base import BaseCommand
 from django.db.models import ProtectedError
@@ -21,6 +22,8 @@ def _delete_unlinked_placeholders():
     logger.info(f"Orphaned placeholders found: {placeholders.count()}")
 
     for placeholder in placeholders:
+        sys.stdout.write('.')
+        sys.stdout.flush()
         try:
             logger.debug(f"Deleting Placeholder {placeholder.id}")
             placeholder.delete()

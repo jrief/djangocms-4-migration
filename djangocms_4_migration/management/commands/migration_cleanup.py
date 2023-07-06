@@ -1,4 +1,5 @@
 import logging
+import sys
 
 from django.core.management.base import BaseCommand
 from django.contrib.contenttypes.models import ContentType
@@ -9,7 +10,12 @@ from cms.models import (
     Placeholder,
     Page,
     PageContent,
+    PagePermission,
 )
+
+from cmsplugin_cascade.models import CascadePage
+from uniweb.models.classification import Classification
+from uniweb.models.department import Department
 
 from djangocms_versioning.models import Version
 
@@ -72,10 +78,26 @@ class Command(BaseCommand):
 
         for page in page_list:
             # FIXME: An EmptyPageContent type is also deletable!!!
+            sys.stdout.write('.')
+            sys.stdout.flush()
 
             page_content_list = _get_page_contents(page)
 
             if not page_content_list.exists():
+                page.pagepermission_set.all().delete()
+                try:
+                    page.cascadepage.delete()
+                except CascadePage.DoesNotExist:
+                    pass
+                try:
+                    page.classification.delete()
+                except Classification.DoesNotExist:
+                    pass
+                try:
+                    page.department.delete()
+                except Department.DoesNotExist:
+                    pass
+
                 _delete_page(page)
                 stats['page_deleted'] = stats['page_deleted'] + 1
                 continue
