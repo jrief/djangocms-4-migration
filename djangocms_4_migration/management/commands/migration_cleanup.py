@@ -10,7 +10,6 @@ from cms.models import (
     Placeholder,
     Page,
     PageContent,
-    PagePermission,
 )
 
 from cmsplugin_cascade.models import CascadePage
@@ -88,14 +87,6 @@ class Command(BaseCommand):
                 try:
                     page.cascadepage.delete()
                 except CascadePage.DoesNotExist:
-                    pass
-                try:
-                    page.classification.delete()
-                except Classification.DoesNotExist:
-                    pass
-                try:
-                    page.department.delete()
-                except Department.DoesNotExist:
                     pass
 
                 _delete_page(page)

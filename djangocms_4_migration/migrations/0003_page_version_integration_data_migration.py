@@ -1,7 +1,7 @@
 import logging
-import os
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import migrations
 from djangocms_versioning.constants import ARCHIVED, DRAFT, PUBLISHED
 
@@ -21,7 +21,7 @@ def forwards(apps, schema_editor):
     PageContent = apps.get_model("cms", "PageContent")
     Version = apps.get_model("djangocms_versioning", "Version")
     PageData = apps.get_model("djangocms_4_migration", "PageData")
-    User = apps.get_model(*settings.AUTH_USER_MODEL.split('.'))
+    UserModel = get_user_model()  # apps.get_model(*settings.AUTH_USER_MODEL.split('.'))
     ContentType = apps.get_model('contenttypes', 'ContentType')
 
     page_content_contenttype = ContentType.objects.get(app_label='cms', model='pagecontent')
@@ -63,21 +63,25 @@ def forwards(apps, schema_editor):
     def _create_version(page_content, state=DRAFT, number=1):
         # Find the user
         try:
-            created_by = User.objects.using(db_alias).get(
+            created_by = UserModel.objects.using(db_alias).get(
                 username=page_content.page.created_by
             )
-        except:
-            # Use the first super user as the author as a fall back
-            # The create page api allocates 'python-api' as the user!
-            logger.warning("User {} not found, falling back.".format(page_content.page.created_by))
-            created_by, created = get_or_create_migration_user(user_model=User)
+        except UserModel.DoesNotExist:
+            created_by = UserModel.objects.using(db_alias).filter(
+                display_name=page_content.page.created_by
+            ).first()
+            if not created_by:
+                # Use the first super user as the author as a fall back
+                # The create page api allocates 'python-api' as the user!
+                logger.warning("User {} not found, falling back.".format(page_content.page.created_by))
+                created_by, created = get_or_create_migration_user(user_model=UserModel)
 
         logger.info("Creating version for new title: {}".format(page_content.pk))
 
         # Create a new version for the page
         # Recheck
         Version.objects.using(db_alias).create(
-            created_by=created_by,
+            created_by_id=created_by.id,
             state=state,
             number=number,
             object_id=page_content.pk,
